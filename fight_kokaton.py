@@ -97,7 +97,7 @@ class Beam:
         ビーム画像Surfaceを生成する
         引数 bird：ビームを放つこうかとん（Birdインスタンス）
         """
-        self.img = pg.image.load(f"fig/beam.png")
+        self.img = pg.image.load(f"fig/beam.png") #beam.pngをgitに追加するのを忘れずに
         self.rct = self.img.get_rect()
         
         # こうかとんの向きによってビームの速度を設定
