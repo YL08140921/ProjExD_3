@@ -183,7 +183,7 @@ class Score:
     """
     スコアに関するクラス
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.fonto = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
         self.color = (0, 0, 255)
         self.score = 0
@@ -191,7 +191,10 @@ class Score:
         self.rct = self.img.get_rect()
         self.rct.center = (100, HEIGHT - 50)
 
-    def update(self, screen: pg.Surface):
+    def update(self, screen: pg.Surface) -> None:
+        """
+        引数 画面Surface
+        """
         self.img = self.fonto.render(f"Score: {self.score}", True, self.color)
         screen.blit(self.img, self.rct)
 
