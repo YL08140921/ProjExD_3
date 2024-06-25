@@ -2,6 +2,7 @@ import os
 import random
 import sys
 import time
+import math
 import pygame as pg
 
 
@@ -54,6 +55,7 @@ class Bird:
         引数 xy：こうかとん画像の初期位置座標タプル
         """
         self.img = __class__.imgs[(+5, 0)]
+        self.dire = (+5, 0)
         self.rct: pg.Rect = self.img.get_rect()
         self.rct.center = xy
 
@@ -81,6 +83,7 @@ class Bird:
         if check_bound(self.rct) != (True, True):
             self.rct.move_ip(-sum_mv[0], -sum_mv[1])
         if not (sum_mv[0] == 0 and sum_mv[1] == 0):
+            self.dire = tuple(sum_mv)
             self.img = __class__.imgs[tuple(sum_mv)]
         screen.blit(self.img, self.rct)
 
@@ -96,18 +99,29 @@ class Beam:
         """
         self.img = pg.image.load(f"fig/beam.png")
         self.rct = self.img.get_rect()
-        self.rct.centery = bird.rct.centery  # こうかとんの中心縦座標をビームの中心縦座標に設定
-        self.rct.left = bird.rct.right  # こうかとん右座標をビーム左座標に設定
-        self.vx, self.vy = +5, 0
+        
+        # こうかとんの向きによってビームの速度を設定
+        self.vx, self.vy = bird.dire
+        angle = math.degrees(math.atan2(-self.vy, self.vx))
+        self.img = pg.transform.rotozoom(self.img, angle, 1.0)
+        self.rct = self.img.get_rect()
+
+        # ビームの初期位置を設定
+        self.rct.center = bird.rct.center
+        self.rct.centerx += bird.rct.width * self.vx / 5
+        self.rct.centery += bird.rct.height * self.vy / 5
+
 
     def update(self, screen: pg.Surface):
         """
         ビームを速度ベクトルself.vx, self.vyに基づき移動させる
         引数 screen：画面Surface
         """
-        if check_bound(self.rct) == (True, True):
-            self.rct.move_ip(self.vx, self.vy)
-            screen.blit(self.img, self.rct)    
+        self.rct.move_ip(self.vx, self.vy)
+        screen.blit(self.img, self.rct)
+        if check_bound(self.rct) != (True, True):
+            return True
+        return False
 
 
 class Bomb:
@@ -201,7 +215,7 @@ def main():
                 return
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 # スペースキー押下でBeamクラスのインスタンス生成
-                beam = Beam(bird)
+                # beam = Beam(bird)
                 beams.append(Beam(bird))
 
         screen.blit(bg_img, [0, 0])
